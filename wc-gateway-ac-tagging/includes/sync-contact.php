@@ -1,5 +1,5 @@
 <?php
-namespace mtreherne\WC_AC_Hook;
+namespace sbma\KJG_WC_AC_Hook;
 /**
  * This class is used to add/update (sync) contact details on ActiveCampaign
  * It uses the official PHP wrapper for the ActiveCampaign API to make it easy
@@ -7,9 +7,9 @@ namespace mtreherne\WC_AC_Hook;
  */
 if (!defined('ABSPATH')) exit();
 
-if (!class_exists(__NAMESPACE__ . '\WC_AC_Hook_Sync')) :
+if (!class_exists(__NAMESPACE__ . '\KJG_WC_AC_Hook_Sync')) :
 
-class WC_AC_Hook_Sync {
+class KJG_WC_AC_Hook_Sync {
 
 	private $api_valid = false;
 	private $activecampaign_connection;
@@ -19,7 +19,7 @@ class WC_AC_Hook_Sync {
 	
 	public function __construct($options) {
 		if (!is_numeric ($options['ac_list_id'] ?? null)) {
-			$this->log_message[] = sprintf( __( 'Error: List ID is not numeric = %s', 'wc-ac-hook' ), $options['ac_list_id'] ?? 'undefined');
+			$this->log_message[] = sprintf( __( 'Error: List ID is not numeric = %s', 'kjg-wc-ac-hook' ), $options['ac_list_id'] ?? 'undefined');
 		}
 		else {
 			$this->form_id = $options['wc_ac_marketing_form_id'] ?? null;
@@ -28,7 +28,7 @@ class WC_AC_Hook_Sync {
 			// Validate the ActiveCampaign credentials
 			$this->activecampaign_connection = new ActiveCampaign($options['ac_url'] ?? null, $options['ac_api_key'] ?? null);
 			if (!(int)$this->activecampaign_connection->credentials_test()) {
-				$this->log_message[] = sprintf( __( 'Error: Invalid Active Campaign credentials, URL = %1$s, API Key = %2$s', 'wc-ac-hook' ), $options['ac_url'] ?? 'undefined', $options['ac_api_key'] ?? 'undefined');
+				$this->log_message[] = sprintf( __( 'Error: Invalid Active Campaign credentials, URL = %1$s, API Key = %2$s', 'kjg-wc-ac-hook' ), $options['ac_url'] ?? 'undefined', $options['ac_api_key'] ?? 'undefined');
 			}
 			else $this->api_valid = true;
 		}
@@ -46,24 +46,24 @@ class WC_AC_Hook_Sync {
 			$contact_sync = $this->activecampaign_connection->api('contact/sync', $contact);	
 			if ((int)$contact_sync->success) {
 				$contact_id = (int)$contact_sync->subscriber_id;
-				$this->log_message[] = sprintf( __( 'Contact synced successfully (ActiveCampaign ID = %s). Tags added: %s', 'wc-ac-hook' ), $contact_id, $contact['tags']);
+				$this->log_message[] = sprintf( __( 'Contact synced successfully (ActiveCampaign ID = %s). Tags added: %s', 'kjg-wc-ac-hook' ), $contact_id, $contact['tags']);
 			}
-			else $this->log_message[] = sprintf( __( 'Syncing contact failed. Error returned: %s)', 'wc-ac-hook' ), $contact_sync->error);
+			else $this->log_message[] = sprintf( __( 'Syncing contact failed. Error returned: %s)', 'kjg-wc-ac-hook' ), $contact_sync->error);
 		}
 	}
 	
 	public function form_subscribe($contact) {
 		if (!is_numeric ($this->form_id)) {
-			$this->log_message[] = sprintf( __( 'Error: Form ID is not numeric = %s', 'wc-ac-hook' ), $this->form_id ?? 'undefined');
+			$this->log_message[] = sprintf( __( 'Error: Form ID is not numeric = %s', 'kjg-wc-ac-hook' ), $this->form_id ?? 'undefined');
 		}
 		elseif ($this->api_valid) {
 			$contact['form'] = $this->form_id;
 			$contact_sync = $this->activecampaign_connection->api('contact/sync', $contact);
 			if ((int)$contact_sync->success) {
 				$contact_id = (int)$contact_sync->subscriber_id;
-				$this->log_message[] = sprintf( __( 'Contact subscribed to form %s (ActiveCampaign ID = %s)', 'wc-ac-hook' ), $this->form_id, $contact_id);
+				$this->log_message[] = sprintf( __( 'Contact subscribed to form %s (ActiveCampaign ID = %s)', 'kjg-wc-ac-hook' ), $this->form_id, $contact_id);
 			}
-			else $this->log_message[] = sprintf( __( 'Syncing contact failed. Error returned: %s)', 'wc-ac-hook' ), $contact_sync->error);
+			else $this->log_message[] = sprintf( __( 'Syncing contact failed. Error returned: %s)', 'kjg-wc-ac-hook' ), $contact_sync->error);
 		}
 	}
 
@@ -71,7 +71,7 @@ class WC_AC_Hook_Sync {
 		if ($this->api_valid) {
 			$tag_remove = $this->activecampaign_connection->api('contact/tag_remove', $contact);
 			if (!(int)$tag_remove->success) 
-				$this->log_message[] = sprintf( __( 'Remove tags on contact failed. Error returned: %s)', 'wc-ac-hook' ), $tag_remove->error);
+				$this->log_message[] = sprintf( __( 'Remove tags on contact failed. Error returned: %s)', 'kjg-wc-ac-hook' ), $tag_remove->error);
 		}
 	}
 	
