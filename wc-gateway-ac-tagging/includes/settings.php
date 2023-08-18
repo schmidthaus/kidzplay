@@ -4,7 +4,7 @@ namespace sbma\KJG_WC_AC_Hook;
 use WC_Integration;
 
 /**
- * Class for WC AC Hook settings fields in administration panel. This class will add the necessary
+ * Class for KJG WC AC Hook settings fields in administration panel. This class will add the necessary
  * form fields to the 'Integration' tab of the WooCommerce Settings menu.
  *
  */
@@ -16,7 +16,7 @@ class KJG_WC_AC_Hook_Integration extends WC_Integration {
 
 	public function __construct() {
 		$this->id = 'kjg-wc-ac-hook';
-		$this->method_title = __( 'WC-AC Hook', 'kjg-wc-ac-hook' );
+		$this->method_title = __( 'Payment Gateway WC-AC Tags', 'kjg-wc-ac-hook' );
 		$this->method_description = __( 'You must enter your ActiveCampaign URL and your ActiveCampaign API key to allow the WooCommerce web hook to add/update contacts when an order is placed. Enter the ActiveCampaign List ID to which you want contacts added. You may also have tags dependent on the product ordered. You will find an ActiveCampaign Tag field in the Advanced Product Data section for each WooCommerce product in your shop. For more information read the FAQs by viewing the plugin details.', 'kjg-wc-ac-hook' );
 		$this->init_form_fields();
 		add_action( 'woocommerce_update_options_integration_' . $this->id, array( $this, 'process_admin_options' ) );
@@ -95,6 +95,17 @@ class KJG_WC_AC_Hook_Integration extends WC_Integration {
 				'desc_tip'		=> true
 			)
 		);
+	}
+	
+	for ($i = 1; $i <= 5; $i++) {
+		$this->form_fields["gateway_name_$i"] = [
+			'title' => __("Payment Gateway Name $i", 'kjg-wc-ac-hook'),
+			'type' => 'text',
+		];
+		$this->form_fields["gateway_tags_$i"] = [
+			'title' => __("Associated Tags $i", 'kjg-wc-ac-hook'),
+			'type' => 'text',
+		];
 	}
 
 }

@@ -93,7 +93,7 @@ class KJG_WC_AC_Hook {
 		if (($new_status == 'completed' && $add_on_processing != 'yes') || ($new_status == 'processing' && $add_on_processing == 'yes') || (in_array($new_status,$valid_status) && $order_tracking == 'yes')) $sync_contact = true;
 		if (!$form_signup && !$sync_contact) return;
 	
-		// Get order deails and validate
+		// Get order details and validate
 		$valid_order = true;
 		$order = new WC_Order( $order_id );
 		$order_billing_first_name = method_exists($order,'get_billing_first_name') ? $order->get_billing_first_name() : $order->billing_first_name;
@@ -105,6 +105,16 @@ class KJG_WC_AC_Hook {
 			$valid_order = false;
 			$log_message[] = sprintf( __( 'Error: Invalid customer (billing) email address = %s', 'kjg-wc-ac-hook' ), $order_billing_email);
 		}
+		// Get the payment gateway used for the order
+		$paymentGatewayDetection = new KJG_WC_AC_Payment_Gateway_Detection();
+		$payment_gateway = $paymentGatewayDetection->get_payment_gateway($order_id);
+		
+		// Get the payment gateway options from the settings
+		$gateway_options = $this->get_payment_gateway_options();
+		
+		// Retrieve the tags associated with the payment gateway
+		$tags = $gateway_options[$payment_gateway]['tags'] ?? '';
+		
 		if ($valid_order) {
 			include_once 'sync-contact.php';
 			$api = new KJG_WC_AC_Hook_Sync($options);
@@ -196,8 +206,25 @@ class KJG_WC_AC_Hook {
 			'default'	=> $marketing_checkout == 'opt_out' ? 1 : null,
 		), $checkout->get_value('wc_ac_marketing_checkbox'));
 	}
+	
+	public function set_payment_gateway_options($options) {
+		update_option('kjg_wc_ac_payment_gateway_options', $options);
+	}
+	
+	public function get_payment_gateway_options() {
+		return get_option('kjg_wc_ac_payment_gateway_options', []);
+	}
 
 }
+
+class KJG_WC_AC_Payment_Gateway_Detection {
+	public function get_payment_gateway($order_id) {
+		$order = wc_get_order($order_id);
+		return $order->get_payment_method_title();
+	}
+}
+
+
 
 new KJG_WC_AC_Hook();
 
