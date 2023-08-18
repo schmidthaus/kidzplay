@@ -10,7 +10,7 @@ if (!class_exists(__NAMESPACE__ . '\KJG_WC_AC_Hook') && ( in_array( 'woocommerce
 
 class KJG_WC_AC_Hook {
 
-	const OPTION_NAME = 'woocommerce_wc-ac-hook_settings';
+	const OPTION_NAME = 'kjg-woocommerce_wc-ac-hook_settings';
 	private $basename;
 
 	public function __construct() {
@@ -32,7 +32,7 @@ class KJG_WC_AC_Hook {
 	}
 
 	public function plugin_load_textdomain() {
-		load_plugin_textdomain( 'wc-ac-hook', false, dirname($this->basename) . '/languages' );
+		load_plugin_textdomain( 'kjg-wc-ac-hook', false, dirname($this->basename) . '/languages' );
 	}
 
 	public function init_integration() {
@@ -47,7 +47,7 @@ class KJG_WC_AC_Hook {
 	}
 	
 	public function settings_link($links) {
-		array_unshift($links, '<a href="admin.php?page=wc-settings&tab=integration&section=wc-ac-hook">Settings</a>');
+		array_unshift($links, '<a href="admin.php?page=wc-settings&tab=integration&section=kjg-wc-ac-hook">Settings</a>');
 		return $links;
 	}
 	
@@ -56,9 +56,9 @@ class KJG_WC_AC_Hook {
 		echo '<div class="options_group">';
 		woocommerce_wp_text_input(array(
 			'id' 			=> 'activecampaign_tag',
-			'label' 		=> __( 'ActiveCampaign Tag', 'wc-ac-hook' ),
+			'label' 		=> __( 'ActiveCampaign Tag', 'kjg-wc-ac-hook' ),
 			'desc_tip' 		=> 'true',
-			'description' 	=> __( 'Contact will be given this tag on ActiveCampaign when ordered', 'wc-ac-hook' )));
+			'description' 	=> __( 'Contact will be given this tag on ActiveCampaign when ordered', 'kjg-wc-ac-hook' )));
 		echo '</div>';
 	}
 
@@ -103,7 +103,7 @@ class KJG_WC_AC_Hook {
 		// eMail is the key on ActiveCampaign so should be validated
 		if (!is_email ($order_billing_email)) {
 			$valid_order = false;
-			$log_message[] = sprintf( __( 'Error: Invalid customer (billing) email address = %s', 'wc-ac-hook' ), $order_billing_email);
+			$log_message[] = sprintf( __( 'Error: Invalid customer (billing) email address = %s', 'kjg-wc-ac-hook' ), $order_billing_email);
 		}
 		if ($valid_order) {
 			include_once 'sync-contact.php';
@@ -179,9 +179,9 @@ class KJG_WC_AC_Hook {
 		if ($valid_order) $log_message = $api->log_message;
 		if ($logging_enabled != 'no') {
 			$log = new WC_Logger();
-			$log_string = sprintf( __( 'Order ID = %s (Status = %s).', 'wc-ac-hook' ), $order_id, $new_status);
+			$log_string = sprintf( __( 'Order ID = %s (Status = %s).', 'kjg-wc-ac-hook' ), $order_id, $new_status);
 			foreach ($log_message as $value) $log_string .= ' '.$value;
-			$log->add( 'wc-ac-hook', $log_string);
+			$log->add( 'kjg-wc-ac-hook', $log_string);
 		}
 		
 	}

@@ -36,7 +36,7 @@ $GLOBALS['KJG_WC_AC_Hook_basename'] = plugin_basename(__FILE__);
 function KJG_WC_AC_Hook_deactivate() { deactivate_plugins( $GLOBALS['KJG_WC_AC_Hook_basename'] ); }
 function KJG_WC_AC_Hook_show_deactivation_notice() {
 	$class = 'notice notice-error';
-	$message = __( '"KJG-WC-AC Hook" requires PHP 5.3 or newer.', 'wc-ac-hook' );
+	$message = __( '"KJG-WC-AC Hook" requires PHP 5.3 or newer.', 'kjg-wc-ac-hook' );
 	printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message ) ); 
 }
 if ( ! version_compare( PHP_VERSION, '5.3.0', '>=' ) ) {
