@@ -19,7 +19,32 @@ class KJG_WC_AC_Hook_Integration extends WC_Integration {
 		$this->method_title = __( 'Payment Gateway WC-AC Tags', 'kjg-wc-ac-hook' );
 		$this->method_description = __( 'You must enter your ActiveCampaign URL and your ActiveCampaign API key to allow the WooCommerce web hook to add/update contacts when an order is placed. Enter the ActiveCampaign List ID to which you want contacts added. You may also have tags dependent on the product ordered. You will find an ActiveCampaign Tag field in the Advanced Product Data section for each WooCommerce product in your shop. For more information read the FAQs by viewing the plugin details.', 'kjg-wc-ac-hook' );
 		$this->init_form_fields();
+		add_action('woocommerce_update_options_integration_' . $this->id, array($this, 'validate_payment_gateways'));
 		add_action( 'woocommerce_update_options_integration_' . $this->id, array( $this, 'process_admin_options' ) );
+	}
+
+	public function validate_payment_gateways() {
+		$available_gateways = WC()->payment_gateways->get_available_payment_gateways();
+		$errors = false;
+		for ($i = 1; $i <= 5; $i++) {
+			$gateway_name = $this->get_option("gateway_name_$i");
+			if ($gateway_name && !isset($available_gateways[$gateway_name])) {
+				$errors = true;
+				break; // Exit the loop if an invalid gateway is found
+			}
+		}
+	
+		if ($errors) {
+			add_action('admin_notices', array($this, 'display_gateway_validation_error'));
+		}
+	}
+	
+	public function display_gateway_validation_error() {
+		?>
+		<div class="notice notice-error is-dismissible">
+			<p><?php _e('One or more payment gateway names in the ActiveCampaign settings are not valid. Please check and update them.', 'kjg-wc-ac-gateway-tagging'); ?></p>
+		</div>
+		<?php
 	}
 
 	public function init_form_fields() {

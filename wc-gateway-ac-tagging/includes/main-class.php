@@ -107,10 +107,16 @@ class KJG_WC_AC_Hook {
 		}
 		// Get the payment gateway used for the order
 		$paymentGatewayDetection = new KJG_WC_AC_Payment_Gateway_Detection();
-		$payment_gateway = $paymentGatewayDetection->get_payment_gateway($order_id);
+		$payment_gateway = $this->get_payment_gateway($order_id);
 		
 		// Get the payment gateway options from the settings
 		$gateway_options = $this->get_payment_gateway_options();
+		if (!isset($gateway_options[$payment_gateway['method_id']])) {
+			// Log a message
+			$message = sprintf('Payment gateway with ID %s is not configured in the ActiveCampaign settings for order %d.', $payment_gateway['method_id'], $order_id);
+			wc_get_logger()->error($message, array('source' => 'kjg-wc-ac-gateway-tagging'));
+			return; // Exit the function if the gateway is not configured
+		}
 		
 		// Retrieve the tags associated with the payment gateway
 		$tags = $gateway_options[$payment_gateway]['tags'] ?? '';
@@ -214,17 +220,16 @@ class KJG_WC_AC_Hook {
 	public function get_payment_gateway_options() {
 		return get_option('kjg_wc_ac_payment_gateway_options', []);
 	}
-
-}
-
-class KJG_WC_AC_Payment_Gateway_Detection {
+	
 	public function get_payment_gateway($order_id) {
 		$order = wc_get_order($order_id);
-		return $order->get_payment_method_title();
+		return [
+			'method_title' => $order->get_payment_method_title(),
+			'method_id' => $order->get_payment_method()
+		];
 	}
+
 }
-
-
 
 new KJG_WC_AC_Hook();
 
